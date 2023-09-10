@@ -1164,7 +1164,7 @@ Double_t addZ(Double_t x, THcNPSShowerHit* h) {
   return x + h->hitE() * h->hitZ();
 }
 
-Double_t addT(Double_t x, THcNPSSHowerHit* h) {
+Double_t addT(Double_t x, THcNPSShowerHit* h) {
   return x + h->hitE() * h->hitT();
 }
 
@@ -1206,7 +1206,7 @@ Double_t clZ(THcNPSShowerCluster* cluster) {
 // Time of cluster, calculated as a hit energy weighted average. 
 // Put T at -100 ns if there is no energy deposition in cluster.
 //
-Double_t clT(THcNPSSHowerCluster* cluster) {
+Double_t clT(THcNPSShowerCluster* cluster) {
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
   return (Etot != 0. ?
 	  accumulate((*cluster).begin(),(*cluster).end(),0.,addT)/Etot : -100.);

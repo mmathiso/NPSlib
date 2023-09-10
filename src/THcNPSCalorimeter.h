@@ -230,7 +230,7 @@ Double_t addE(Double_t x, THcNPSShowerHit* h);
 Double_t addX(Double_t x, THcNPSShowerHit* h);
 Double_t addY(Double_t x, THcNPSShowerHit* h);
 Double_t addZ(Double_t x, THcNPSShowerHit* h);
-Double_t addT(Double_t x, THcNPSSHowerHit* h);
+Double_t addT(Double_t x, THcNPSShowerHit* h);
 Double_t addEpr(Double_t x, THcNPSShowerHit* h);
 
 // Methods to calculate coordinates and energy depositions for a given cluster.

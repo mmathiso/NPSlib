@@ -21,9 +21,14 @@ class THcNPSCluster : public THaCluster {
   Double_t E() const { return fE; }
   void     SetEnergy(Double_t e) { fE = e; }
 
+  Double_t T() const { return fT; }
+  void     SetTime(Double_t t) { fT = t; }
+
  protected:
 
   Double_t fE; // Cluster energy deposit
+
+  Double_t fT;  // Cluster time
   
   ClassDef(THcNPSCluster,0)
 
