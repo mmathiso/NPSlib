@@ -21,7 +21,7 @@ void THcNPSCluster::Clear( Option_t* )
 
 {
   fCenter.SetXYZ( kBig, kBig, kBig);
-  fT = 0;
+  fT = kBig;
   fE = 0;
 }
 

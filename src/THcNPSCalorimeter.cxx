@@ -801,7 +801,7 @@ void THcNPSCalorimeter::ClusterNPS_Hits(THcNPSShowerHitSet& HitSet, THcNPSShower
     blk_energy[ (*ihit)->hitID() ]    =  (*ihit)->hitE();
     good_blk_id.push_back( (*ihit)->hitID() );
     //good_blk_pulseInt.push_back( (*ihit)->hitPI() );
-    good_blk_energy.push_back( (*ihit)->hitPI() );
+    good_blk_energy.push_back( (*ihit)->hitE() );
     
     //Set hit block index
     blk_hit_idx[ (*ihit)->hitID() ] = fNbBlocks;
@@ -1209,7 +1209,7 @@ Double_t clZ(THcNPSShowerCluster* cluster) {
 Double_t clT(THcNPSShowerCluster* cluster) {
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
   return (Etot != 0. ?
-	  accumulate((*cluster).begin(),(*cluster).end(),0.,addT)/Etot : -100.);
+	  accumulate((*cluster).begin(),(*cluster).end(),0.,addT)/Etot : -1000.);
 }
 
 //Energy depostion in a cluster
