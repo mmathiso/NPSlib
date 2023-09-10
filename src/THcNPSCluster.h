@@ -12,7 +12,7 @@
 class THcNPSCluster : public THaCluster {
  public:
   THcNPSCluster();
-  THcNPSCluster(Double_t x, Double_t y, Double_t z, Double_t e);
+  THcNPSCluster(Double_t x, Double_t y, Double_t z, Double_t t, Double_t e);
   virtual ~THcNPSCluster() = default;
 
   virtual void Clear( Option_t* opt="" );
