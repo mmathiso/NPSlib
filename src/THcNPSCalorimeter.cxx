@@ -385,11 +385,11 @@ Int_t THcNPSCalorimeter::DefineVariables( EMode mode )
     { "nhits",        "Number of hits",                             "fNhits" },
     { "nclust",       "Number of layer clusters",                   "fNclust" },
     { "etot",         "Total energy",                               "fEtot" },
-    { "clusX",        "Cluster x coordinate",                       "clX" },
-    { "clusY",        "Cluster y coordinate",                       "clY" },
-    { "clusZ",        "Cluster z coordinate",                       "clZ" },
-    { "clusT",        "Cluster time",                               "clT" },
-    { "clusE",        "Cluster energy",                             "clE" },
+    { "clusX",        "Cluster x coordinate",                       "fClusterX" },
+    { "clusY",        "Cluster y coordinate",                       "fClusterY" },
+    { "clusZ",        "Cluster z coordinate",                       "fClusterZ" },
+    { "clusT",        "Cluster time",                               "fClusterT" },
+    { "clusE",        "Cluster energy",                             "fClusterE" },
     { "etrack",       "Track energy",                               "fEtrack" },  // We don't really need these track associated variables, remove?
     { "eprtrack",     "Track Preshower energy",                     "fEPRtrack" },
     { "eprtracknorm", "Preshower energy divided by track momentum", "fEPRtrackNorm" },
@@ -1271,11 +1271,24 @@ Int_t THcNPSCalorimeter::FineProcess( TClonesArray& tracks )
 
   fClusters.clear();
 
+  fClusterX.clear();
+  fClusterY.clear();
+  fClusterZ.clear();
+  fClusterT.clear();
+  fClusterE.clear();
+
   // Loop over all clusters, get position, time, and energy
   for(THcNPSShowerClusterListIt ppcl = (*fClusterList).begin();
       ppcl != (*fClusterList).end(); ++ppcl) {
     THcNPSCluster cls(clX(*ppcl), clY(*ppcl), clZ(*ppcl), clT(*ppcl), clE(*ppcl));
     fClusters.push_back(cls);
+    
+    fClusterX.push_back(clX(*ppcl));
+    fClusterY.push_back(clY(*ppcl));
+    fClusterZ.push_back(clZ(*ppcl));
+    fClusterT.push_back(clT(*ppcl));
+    fClusterE.push_back(clE(*ppcl));
+    
   }
   
   return 0;
