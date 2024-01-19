@@ -1328,37 +1328,86 @@ Double_t addEpr(Double_t x, THcNPSShowerHit* h) {
   return h->hitColumn() == 0 ? x + h->hitE() : x;
 }
 
+/*Double_t hitW(THcNPSShowerHit* h, THcNPSShowerCluster* cluster) {
+  Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
+  return W0 + TMath::Log(h->hitE()/Etot) > 0. ? W0 + TMath::Log(h->hitE()/Etot) : 0.;
+}
+
+Double_t addW(Double_t x, THcNPSSHowerHit* h, THcNPSShowerCluster* cluster) {
+  Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
+  return W0 + TMath::Log(h->hitE()/Etot) > 0. ? x + (W0 + TMath::Log(h->hitE()/Etot)) : x;
+  }*/
+
 // Y coordinate of center of gravity of cluster, calculated as hit energy
 // weighted average. Put X out of the calorimeter (-100 cm), if there is no
 // energy deposition in the cluster.
 //
-Double_t clY(THcNPSShowerCluster* cluster) {
+/*Double_t clY(THcNPSShowerCluster* cluster) {
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
   return (Etot != 0. ?
 	  accumulate((*cluster).begin(),(*cluster).end(),0.,addY)/Etot : -100.);
+	  }*/
+
+Doublt_t clY(THcNPSShowerCluster* cluster) {
+  Double_t x = 0;
+  Double_t Wtot = 0;
+  Double_t hitW = 0;
+  Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
+  for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
+    hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
+    Wtot += hitW;
+    x += hitW * (*pph)->hitY();
+  }
+  return (Wtot != 0. ? x/Wtot : -100.);
 }
 // X coordinate of center of gravity of cluster, calculated as hit energy
 // weighted average. Put X out of the calorimeter (-100 cm), if there is no
 // energy deposition in the cluster.
 //
-Double_t clX(THcNPSShowerCluster* cluster) {
+/*Double_t clX(THcNPSShowerCluster* cluster) {
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
   return (Etot != 0. ?
 	  accumulate((*cluster).begin(),(*cluster).end(),0.,addX)/Etot : -100.);
+	  }*/
+
+Double_t clX(THcNPSShowerCluster* cluster) {
+  Double_t x = 0;
+  Double_t Wtot = 0;
+  Double_t hitW = 0;
+  Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
+  for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
+    hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
+    Wtot += hitW;
+    x += hitW * (*pph)->hitX();
+  }
+  return (Wtot != 0. ? x/Wtot : -100.); 
 }
 
 // Z coordinate of center of gravity of cluster, calculated as a hit energy
 // weighted average. Put Z out of the calorimeter (0 cm), if there is no energy
 // deposition in the cluster.
 //
-Double_t clZ(THcNPSShowerCluster* cluster) {
+/*Double_t clZ(THcNPSShowerCluster* cluster) {
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
   return (Etot != 0. ?
 	  accumulate((*cluster).begin(),(*cluster).end(),0.,addZ)/Etot : 0.);
+	  }*/
+
+Double_t clZ(THcNPSShowerCluster* cluster) {
+  Double_t x = 0; 
+  Double_t Wtot = 0;
+  Double_t hitW = 0;
+  Double_t Etot = accumulate((*cluster).begin(),(*cluter).end(),0.,addE);
+  for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
+    hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
+    Wtot += hitW;
+    x += hitW * (*pph)->hitZ();
+  }
+  return (Wtot != 0. ? x/Wtot : 0.);
 }
 
 // Time of cluster, calculated as a hit energy weighted average.
-// Put T at -1000 ns if there is no energy deposition in cluster.
+// Put T at 0 ns if there is no energy deposition in cluster.
 //
 Double_t clT(THcNPSShowerCluster* cluster) {
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
