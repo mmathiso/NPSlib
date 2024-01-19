@@ -1348,10 +1348,11 @@ Double_t addW(Double_t x, THcNPSSHowerHit* h, THcNPSShowerCluster* cluster) {
 	  accumulate((*cluster).begin(),(*cluster).end(),0.,addY)/Etot : -100.);
 	  }*/
 
-Doublt_t clY(THcNPSShowerCluster* cluster) {
+Double_t clY(THcNPSShowerCluster* cluster) {
   Double_t x = 0;
   Double_t Wtot = 0;
   Double_t hitW = 0;
+  Double_t W0 = 4;
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
   for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
     hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
@@ -1374,6 +1375,7 @@ Double_t clX(THcNPSShowerCluster* cluster) {
   Double_t x = 0;
   Double_t Wtot = 0;
   Double_t hitW = 0;
+  Double_t W0 = 4;
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
   for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
     hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
@@ -1397,6 +1399,7 @@ Double_t clZ(THcNPSShowerCluster* cluster) {
   Double_t x = 0; 
   Double_t Wtot = 0;
   Double_t hitW = 0;
+  Double_t W0 = 4;
   Double_t Etot = accumulate((*cluster).begin(),(*cluter).end(),0.,addE);
   for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
     hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
