@@ -1109,7 +1109,7 @@ void THcNPSCalorimeter::ClusterNPS_Hits(THcNPSShowerHitSet& HitSet, THcNPSShower
 	  
 	  //Check if kth neighbor block exists (is physically real) and  was actually hit within clustering time window (has good pulse integral in time window)
           //M. Mathison Oct. 31, 2023: Added in time window for clustering.
-	  if( fArray->GetNeighbor(good_blk_id[j], k)!=-1  && blk_hit_idx[ fArray->GetNeighbor(good_blk_id[j], k) ]!=-1 && TMath::Abs(blk_pulseTime[ fArray->GetNeighbor(good_blk_id[j], k) ] - blk_pulseTime[ good_blk_id[j] ]) < fClusterTimeWindow ){
+	  if( fArray->GetNeighbor(good_blk_id[j], k)!=-1  && blk_hit_idx[ fArray->GetNeighbor(good_blk_id[j], k) ]!=-1 && (blk_pulseTime[ fArray->GetNeighbor(good_blk_id[j], k) ] - blk_pulseTime[ good_blk_id[j] ]) > -fClusterTimeWindow && (blk_pulseTime[ fArray->GetNeighbor(good_blk_id[j], k) ] - blk_pulseTime[ good_blk_id[j] ]) < fClusterTimeWindow ){
 
 	    //cout<< "Valid Neighbor Found : (k-index, Neighbor Block ID, pulseInt) = " << k << ", " <<  fArray->GetNeighbor(good_blk_id[j], k)  << ", " << blk_pulseInt[ fArray->GetNeighbor(good_blk_id[j], k) ] << endl; 
 
@@ -1223,8 +1223,8 @@ void THcNPSCalorimeter::ClusterNPS_Hits(THcNPSShowerHitSet& HitSet, THcNPSShower
 
 	  //cout << "TESTING 1: (*i)->hitID = " << (*i)->hitID() << ", (*i) PI = " << pIpas[ (*i)->hitID() ] << ", (*i) T = " << blk_pulseTime[ (*i)->hitID() ] << endl;
 	  //cout << "TESTING 2: (*k)->hitID = " << (*k)->hitID() << ", (*k) PI = " << pIpas[ (*k)->hitID() ] << ", (*k) T = " << blk_pulseTime[ (*k)->hitID() ] << endl;
-	  //cout << "TESTING 3: Pulse diff T = " << TMath::Abs(blk_pulseTime[ (*i)->hitID() ] - blk_pulseTime[ (*k)->hitID() ]) << endl;
-	  if(pIpas[ (*i)->hitID() ] == pIpas[ (*k)->hitID() ] && TMath::Abs(blk_pulseTime[ (*i)->hitID() ] - blk_pulseTime[ (*k)->hitID() ]) < fClusterTimeWindow){
+	  //cout << "TESTING 3: Pulse diff T = " << blk_pulseTime[ (*i)->hitID() ] - blk_pulseTime[ (*k)->hitID() ] << endl;
+	  if(pIpas[ (*i)->hitID() ] == pIpas[ (*k)->hitID() ] && (blk_pulseTime[ (*i)->hitID() ] - blk_pulseTime[ (*k)->hitID() ]) > -fClusterTimeWindow && (blk_pulseTime[ (*i)->hitID() ] - blk_pulseTime[ (*k)->hitID() ]) < fClusterTimeWindow){
 	    //	  if ((**i).isNeighbour(*k)) {
 	    (*cluster).insert(*i);      //If the hit #i is neighbouring a hit
 	    HitSet.erase(i);            //in the cluster, and the hits are 
@@ -1328,23 +1328,44 @@ Double_t addEpr(Double_t x, THcNPSShowerHit* h) {
   return h->hitColumn() == 0 ? x + h->hitE() : x;
 }
 
-// Y coordinate of center of gravity of cluster, calculated as hit energy
-// weighted average. Put X out of the calorimeter (-100 cm), if there is no
-// energy deposition in the cluster.
+
+// M. Mathison 1 Feb. 2024: Changed energy weighting for clX and clY functions
+// to be logarithmic instead of linear. W0 set to 4 as default, but ideally
+// its energy dependence should be found from simulation
+
+// Y coordinate of center of gravity of cluster, calculated as logarithmic hit
+// energy weighted average. Put X out of the calorimeter (-100 cm), if there is 
+// no energy deposition in the cluster.
 //
 Double_t clY(THcNPSShowerCluster* cluster) {
+  Double_t x = 0;
+  Double_t Wtot = 0;
+  Double_t hitW = 0;
+  Double_t W0 = 4;
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
-  return (Etot != 0. ?
-	  accumulate((*cluster).begin(),(*cluster).end(),0.,addY)/Etot : -100.);
+  for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
+    hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
+    Wtot += hitW;
+    x += hitW * (*pph)->hitY();
+  }
+  return (Wtot != 0. ? x/Wtot : -100.);
 }
-// X coordinate of center of gravity of cluster, calculated as hit energy
-// weighted average. Put X out of the calorimeter (-100 cm), if there is no
-// energy deposition in the cluster.
+// X coordinate of center of gravity of cluster, calculated as logarithmic hit
+// energyweighted average. Put X out of the calorimeter (-100 cm), if there is
+// no energy deposition in the cluster.
 //
 Double_t clX(THcNPSShowerCluster* cluster) {
+  Double_t x = 0;
+  Double_t Wtot = 0;
+  Double_t hitW = 0;
+  Double_t W0 = 4;
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
-  return (Etot != 0. ?
-	  accumulate((*cluster).begin(),(*cluster).end(),0.,addX)/Etot : -100.);
+  for (THcNPSShowerClusterIt pph = (*cluster).begin(); pph != (*cluster).end(); ++pph) {
+    hitW = (W0 + TMath::Log((*pph)->hitE()/Etot) > 0. ? W0 + TMath::Log((*pph)->hitE()/Etot) : 0.);
+    Wtot += hitW;
+    x += hitW * (*pph)->hitX();
+  }
+  return (Wtot != 0. ? x/Wtot : -100.); 
 }
 
 // Z coordinate of center of gravity of cluster, calculated as a hit energy
@@ -1357,8 +1378,9 @@ Double_t clZ(THcNPSShowerCluster* cluster) {
 	  accumulate((*cluster).begin(),(*cluster).end(),0.,addZ)/Etot : 0.);
 }
 
+
 // Time of cluster, calculated as a hit energy weighted average.
-// Put T at -1000 ns if there is no energy deposition in cluster.
+// Put T at 0 ns if there is no energy deposition in cluster.
 //
 Double_t clT(THcNPSShowerCluster* cluster) {
   Double_t Etot = accumulate((*cluster).begin(),(*cluster).end(),0.,addE);
